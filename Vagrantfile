@@ -37,7 +37,7 @@ composer_packages     = [        # List any global Composer packages that you wa
   "codeception/codeception=*",
   "phpspec/phpspec:2.0.*@dev",
 ]
-public_folder         = "/vagrant/api" # If installing Symfony or Laravel, leave this blank to default to the framework public directory
+public_folder         = "/vagrant/public" # If installing Symfony or Laravel, leave this blank to default to the framework public directory
 
 
 Vagrant.configure("2") do |config|

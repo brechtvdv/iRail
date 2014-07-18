@@ -1,14 +1,43 @@
 {
-    "name": "irail/irail",
-    "description": "The iRail API",
-    "license": "AGPLv3",
-    "authors": [
-        {
-            "name": "Pieter Colpaert",
-            "email": "pieter.colpaert@okfn.org"
-        }
-    ],
-    "require": {
-        "guzzlehttp/guzzle": "3.8.1"
+  "name": "irail/irail",
+  "description": "The iRail API",
+  "license": "AGPLv3",
+  "authors": [
+    {
+      "name": "Pieter Colpaert",
+      "email": "pieter.colpaert@okfn.org"
     }
+  ],
+  "require": {
+    "laravel/framework": "4.2.*",
+    "guzzle/guzzle" : "3.8.1"
+  },
+  "autoload": {
+    "classmap": [
+      "app/commands",
+      "app/controllers",
+      "app/models",
+      "app/database/migrations",
+      "app/database/seeds",
+      "app/tests/TestCase.php"
+    ]
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "php artisan clear-compiled",
+      "php artisan optimize"
+    ],
+    "post-update-cmd": [
+      "php artisan clear-compiled",
+      "php artisan optimize"
+    ],
+    "post-create-project-cmd": [
+      "php artisan key:generate"
+    ]
+  },
+  "config": {
+    "preferred-install": "dist"
+  },
+  "minimum-stability": "stable"
 }
+
