@@ -3,13 +3,32 @@
 class StationsController extends \BaseController {
 
     /**
-     * Return all the stations according to the language in the right format according to URI parameters and content negotiation
      *
      * @return Response
      */
-    public function index()
+    protected function getData() 
     {
-        //
+        
     }
+    
 
+    protected function serveJSON($data,$callback = "");
+    {
+        
+    }
+    
+    protected function serveXML($data)
+    {
+        
+    }
+    
+    protected function serveHTML($data)
+    {
+        
+    }
+    
+    protected function serveKML($data)
+    {
+        
+    }
 }
