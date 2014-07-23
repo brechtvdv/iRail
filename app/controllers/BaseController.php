@@ -21,8 +21,12 @@ class BaseController extends Controller {
     protected abstract function serveHTML($data);
     protected abstract function serveKML($data);
 
+    protected $language = "en";
 
     public function index() {
+
+        
+
         // first get the data for the resource
         $data = $this->getData();
         // then use this data to serve it
