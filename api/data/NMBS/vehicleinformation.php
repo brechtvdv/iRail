@@ -11,13 +11,16 @@ include_once("data/NMBS/tools.php");
 include_once("data/NMBS/stations.php");
 include_once("../includes/simple_html_dom.php");
 class vehicleinformation{
+
      public static function fillDataRoot($dataroot,$request){
           $lang= $request->getLang();
+          // NMBS stationnames in English are in Dutch
+          // if($lang == 'EN') $lang = 'nl'; // Dutch
 
           $serverData = vehicleinformation::getServerData($request->getVehicleId(),$lang);
           $dataroot->vehicle = vehicleinformation::getVehicleData($serverData, $request->getVehicleId(), $lang);
           $dataroot->stop = array();
-          $dataroot->stop = vehicleinformation::getData($serverData, $lang, $request->getFast());
+          $dataroot->stop = vehicleinformation::getData($serverData, $request->getVehicleId(), $lang, $request->getFast(), true); // an extra request is possible if there are abbreviated stations
      }
 
      private static function getServerData($id,$lang){
@@ -25,7 +28,8 @@ class vehicleinformation{
           $request_options = array(
             "referer" => "http://api.irail.be/",
             "timeout" => "30",
-            "useragent" => $irailAgent,
+            // "useragent" => $irailAgent,
+            "useragent" => "irailAgent",
             );
           $scrapeURL = "http://www.belgianrail.be/jp/sncb-nmbs-routeplanner/trainsearch.exe/" . $lang . "ld=std&seqnr=1&ident=at.02043113.1429435556&";
           $id = preg_replace("/[a-z]+\.[a-z]+\.([a-zA-Z0-9]+)/smi", "\\1", $id);
@@ -49,10 +53,11 @@ class vehicleinformation{
      }
      
 
-     private static function getData($serverData, $lang, $fast){
+     private static function getData($serverData, $id, $lang, $fast, $extra_request){
 	  try{
                $stops = array();
                $html = str_get_html($serverData);
+
                $nodes = $html->getElementById('tq_trainroute_content_table_alteAnsicht')->getElementByTagName('table')->children;
                
                $j = 0;
@@ -80,7 +85,21 @@ class vehicleinformation{
                     if($fast == "true"){
                          $station->name = $stationname;
                     }else{
-                         $station = stations::getStationFromName($stationname,$lang);
+                         // English can return station in Dutch / French, eg. Bru.-Noord / Brux.-Nord
+                         // Therefore, an extra request is needed in other language, to get the proper names of stations
+                         if(!strpos($stationname, "/")) {
+                              $station = stations::getStationFromName($stationname,$lang);
+                         } 
+                         else {
+                              $proper_names = array();
+                              // 1. Get array of all stations in different language
+                              if($extra_request) {
+                                   $lng = "nl";
+                                   $serverData = vehicleinformation::getServerData($id,$lng);
+                                   $proper_names = vehicleinformation::getData($serverData, $id, $lng, $fast, false);
+                              }
+                              $station = stations::getStationFromName($proper_names[$i]->station->name,$lang);
+                         }
                     }
                     $stops[$j]->station = $station;
                     $stops[$j]->delay = $delayseconds;
