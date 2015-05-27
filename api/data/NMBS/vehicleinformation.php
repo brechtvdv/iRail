@@ -85,7 +85,7 @@ class vehicleinformation{
                     if($fast == "true"){
                          $station->name = $stationname;
                     }else{
-                         // English can return station in Dutch / French, eg. Bru.-Noord / Brux.-Nord
+                         // English can return station abbreviated in Dutch / French, eg. Bru.-Noord / Brux.-Nord
                          // Therefore, an extra request is needed in other language, to get the proper names of stations
                          if(!strpos($stationname, "/")) {
                               $station = stations::getStationFromName($stationname,$lang);
@@ -98,7 +98,7 @@ class vehicleinformation{
                                    $serverData = vehicleinformation::getServerData($id,$lng);
                                    $proper_names = vehicleinformation::getData($serverData, $id, $lng, $fast, false);
                               }
-                              $station = stations::getStationFromName($proper_names[$i]->station->name,$lang);
+                              $station = stations::getStationFromName($proper_names[$i-1]->station->name,$lang);
                          }
                     }
                     $stops[$j]->station = $station;
