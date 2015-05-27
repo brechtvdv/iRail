@@ -14,8 +14,6 @@ class vehicleinformation{
 
      public static function fillDataRoot($dataroot,$request){
           $lang= $request->getLang();
-          // NMBS stationnames in English are in Dutch
-          // if($lang == 'EN') $lang = 'nl'; // Dutch
 
           $serverData = vehicleinformation::getServerData($request->getVehicleId(),$lang);
           $dataroot->vehicle = vehicleinformation::getVehicleData($serverData, $request->getVehicleId(), $lang);
@@ -98,7 +96,7 @@ class vehicleinformation{
                                    $serverData = vehicleinformation::getServerData($id,$lng);
                                    $proper_names = vehicleinformation::getData($serverData, $id, $lng, $fast, false);
                               }
-                              $station = stations::getStationFromName($proper_names[$i-1]->station->name,$lang);
+                              $station = stations::getStationFromName($proper_names[$j]->station->name,$lang);
                          }
                     }
                     $stops[$j]->station = $station;
@@ -129,14 +127,27 @@ class vehicleinformation{
                     $node = $nodes[$i];
                     if(!count($node->attr)) continue; // row with no class-attribute contain no data
                     $as = $node->children[3]->find('a');
-                    $station = reset($as[0]->nodes[0]->_);
+
+                    // Station is not Belgian and has no hyperlink
+                    if(count($as) == 0) {
+                         $station = reset($node->children[3]->nodes[0]->_);
+                    } else {
+                         $station = reset($as[0]->nodes[0]->_);
+                    }
           
           	     $locationX = 0;
           	     $locationY = 0;
           	     if(isset($station)){
           	          $now = stations::getStationFromName($station, $lang);
-          	          $locationX = $now->locationX;
-          	          $locationY = $now->locationY;
+
+                         // Station not known (stations.json)
+                         if(!is_object($now)) {
+                              $locationX = 0;
+                              $locationY = 0;
+                         } else {
+               	          $locationX = $now->locationX;
+               	          $locationY = $now->locationY;
+                         }
           	     }
           	     $vehicle = new Vehicle();
           	     $vehicle->name = $id;
